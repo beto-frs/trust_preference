@@ -34,6 +34,9 @@ form.addEventListener('submit', async (event) => {
     });
     const data = await response.json();
     if (!response.ok) {
+      if (response.status === 404 || data.providerStatus === 404) {
+        throw new Error('RUT no encontrado.');
+      }
       const stage = data.stage === 'generate_access_token' ? 'generar el token de acceso' : 'consultar el token del titular';
       throw new Error(`Error al ${stage}${data.providerStatus ? ` (HTTP ${data.providerStatus})` : ''}: ${data.error || 'verifique la configuración de OneTrust.'}`);
     }
