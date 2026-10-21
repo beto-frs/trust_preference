@@ -18,14 +18,14 @@ form.addEventListener('submit', async (event) => {
   resultPanel.hidden = true;
   message.className = 'form-message';
   if (!rut) {
-    showMessage('Informe seu RUT para continuar.', 'error');
+    showMessage('Ingrese su RUT para continuar.', 'error');
     rutInput.focus();
     return;
   }
 
   submitButton.disabled = true;
   submitButton.querySelector('.button-copy').textContent = 'Conectando…';
-  showMessage('Gerando access token e consultando o titular na OneTrust…', 'success');
+  showMessage('Generando el token de acceso y consultando al titular en OneTrust…', 'success');
   try {
     const response = await fetch('/api/data-subject-token', {
       method: 'POST',
@@ -34,23 +34,23 @@ form.addEventListener('submit', async (event) => {
     });
     const data = await response.json();
     if (!response.ok) {
-      const stage = data.stage === 'generate_access_token' ? 'gerar o access token' : 'consultar o token do titular';
-      throw new Error(`Falha ao ${stage}${data.providerStatus ? ` (HTTP ${data.providerStatus})` : ''}: ${data.error || 'verifique a configuração OneTrust.'}`);
+      const stage = data.stage === 'generate_access_token' ? 'generar el token de acceso' : 'consultar el token del titular';
+      throw new Error(`Error al ${stage}${data.providerStatus ? ` (HTTP ${data.providerStatus})` : ''}: ${data.error || 'verifique la configuración de OneTrust.'}`);
     }
     link.href = data.preferenceUrl;
     trustCenterLink.href = data.trustCenterUrl;
     expiryNote.textContent = data.expiryDate
-      ? `Link de uso único. Válido até ${new Intl.DateTimeFormat('pt-BR', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(data.expiryDate))}.`
-      : 'Por segurança, este link é pessoal e de uso único.';
+      ? `Enlace de un solo uso. Válido hasta el ${new Intl.DateTimeFormat('es-CL', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(data.expiryDate))}.`
+      : 'Por seguridad, este enlace es personal y de un solo uso.';
     resultPanel.hidden = false;
-    showMessage('RUT validado com sucesso.', 'success');
+    showMessage('RUT validado correctamente.', 'success');
     resultPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   } catch (error) {
     const isNetworkError = error instanceof TypeError || error.name === 'AbortError';
     showMessage(
       isNetworkError
-        ? 'Não foi possível conectar ao servidor. Verifique se a API está em execução e tente novamente.'
-        : (error.message || 'Falha de comunicação. Verifique a conexão e tente novamente.'),
+        ? 'No fue posible conectarse al servidor. Verifique que la API esté activa e inténtelo nuevamente.'
+        : (error.message || 'Error de comunicación. Verifique su conexión e inténtelo nuevamente.'),
       'error',
     );
   } finally {

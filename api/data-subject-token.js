@@ -3,11 +3,11 @@ import { createDataSubjectLinks } from '../lib/onetrust.mjs';
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
-    return res.status(405).json({ error: 'Método não permitido.' });
+    return res.status(405).json({ error: 'Método no permitido.' });
   }
 
   const identifier = String(req.body?.rut || '').trim();
-  if (!identifier) return res.status(400).json({ error: 'Informe o RUT do titular.' });
+  if (!identifier) return res.status(400).json({ error: 'Ingrese el RUT del titular.' });
 
   try {
     const links = await createDataSubjectLinks(identifier);

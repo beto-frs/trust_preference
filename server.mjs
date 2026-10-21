@@ -42,7 +42,7 @@ async function requestJson(url, options) {
   try {
     response = await fetch(url, { ...options, signal: AbortSignal.timeout(15000) });
   } catch (error) {
-    const networkError = new Error(`Não foi possível conectar à OneTrust: ${error.message}`);
+    const networkError = new Error(`No fue posible conectarse a OneTrust: ${error.message}`);
     networkError.status = 502;
     networkError.code = 'UPSTREAM_UNAVAILABLE';
     throw networkError;
@@ -53,7 +53,7 @@ async function requestJson(url, options) {
   if (!response.ok) {
     const details = data?.message || data?.error_description || data?.error || data?.detail || data?.errors;
     const safeDetails = typeof details === 'string' ? details : details ? JSON.stringify(details) : '';
-    const error = new Error(safeDetails || `A OneTrust recusou a solicitação (HTTP ${response.status}) sem informar detalhes.`);
+    const error = new Error(safeDetails || `OneTrust rechazó la solicitud (HTTP ${response.status}) sin informar detalles.`);
     error.status = response.status;
     error.providerStatus = response.status;
     throw error;
@@ -64,7 +64,7 @@ async function requestJson(url, options) {
 async function getAccessToken() {
   const { ONETRUST_CLIENT_ID, ONETRUST_CLIENT_SECRET } = process.env;
   if (!ONETRUST_CLIENT_ID || !ONETRUST_CLIENT_SECRET) {
-    const error = new Error('Configure ONETRUST_CLIENT_ID e ONETRUST_CLIENT_SECRET no servidor.');
+    const error = new Error('Configure ONETRUST_CLIENT_ID y ONETRUST_CLIENT_SECRET en el servidor.');
     error.status = 503;
     throw error;
   }
@@ -79,7 +79,7 @@ async function getAccessToken() {
     },
     body: form,
   });
-  if (!result.access_token) throw new Error('A resposta da OneTrust não incluiu access_token.');
+  if (!result.access_token) throw new Error('La respuesta de OneTrust no incluyó access_token.');
   return result.access_token;
 }
 
@@ -91,7 +91,7 @@ const server = createServer(async (req, res) => {
   if (req.method === 'POST' && url.pathname === '/api/access-token') {
     try {
       await getAccessToken();
-      return json(res, 200, { success: true, tokenType: 'Bearer', message: 'Access token gerado com sucesso.' });
+      return json(res, 200, { success: true, tokenType: 'Bearer', message: 'Token de acceso generado correctamente.' });
     } catch (error) {
       return json(res, error.status || 502, { stage: 'generate_access_token', error: error.message, providerStatus: error.providerStatus });
     }
@@ -102,7 +102,7 @@ const server = createServer(async (req, res) => {
     let payload;
     try { payload = JSON.parse(raw || '{}'); } catch { return json(res, 400, { error: 'Corpo JSON inválido.' }); }
     const identifier = String(payload.rut || '').trim();
-    if (!identifier) return json(res, 400, { error: 'Informe o RUT do titular.' });
+    if (!identifier) return json(res, 400, { error: 'Ingrese el RUT del titular.' });
     let stage = 'generate_access_token';
     try {
       const accessToken = await getAccessToken();
@@ -112,14 +112,14 @@ const server = createServer(async (req, res) => {
         headers: { Authorization: `Bearer ${accessToken}`, identifier, Accept: 'application/json' },
       });
       const token = result.token;
-      if (!token) throw new Error('A resposta da OneTrust não incluiu o token do titular.');
+      if (!token) throw new Error('La respuesta de OneTrust no incluyó el token del titular.');
       if (!preferenceCenterUrl.includes('<tokenid>')) {
-        const error = new Error('PREFERENCE_CENTER_URL precisa conter o marcador <tokenid>.');
+        const error = new Error('PREFERENCE_CENTER_URL debe contener el marcador <tokenid>.');
         error.status = 500;
         throw error;
       }
       if (!trustCenterUrl.includes('<tokenid>')) {
-        const error = new Error('TRUST_CENTER_URL precisa conter o marcador <tokenid>.');
+        const error = new Error('TRUST_CENTER_URL debe contener el marcador <tokenid>.');
         error.status = 500;
         throw error;
       }
@@ -143,7 +143,7 @@ const server = createServer(async (req, res) => {
     res.writeHead(200, { 'Content-Type': contentTypes[extname(file)] || 'application/octet-stream' });
     res.end(content);
   } catch {
-    json(res, 404, { error: 'Arquivo não encontrado.' });
+    json(res, 404, { error: 'Archivo no encontrado.' });
   }
 });
 
