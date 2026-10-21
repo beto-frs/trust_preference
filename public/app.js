@@ -3,7 +3,6 @@ const rutInput = document.querySelector('#rut');
 const submitButton = document.querySelector('#submit-button');
 const message = document.querySelector('#form-message');
 const resultPanel = document.querySelector('#result');
-const link = document.querySelector('#preference-link');
 const trustCenterLink = document.querySelector('#trust-center-link');
 const expiryNote = document.querySelector('#expiry-note');
 
@@ -40,7 +39,6 @@ form.addEventListener('submit', async (event) => {
       const stage = data.stage === 'generate_access_token' ? 'generar el token de acceso' : 'consultar el token del titular';
       throw new Error(`Error al ${stage}${data.providerStatus ? ` (HTTP ${data.providerStatus})` : ''}: ${data.error || 'verifique la configuración de OneTrust.'}`);
     }
-    link.href = data.preferenceUrl;
     trustCenterLink.href = data.trustCenterUrl;
     expiryNote.textContent = data.expiryDate
       ? `Enlace de un solo uso. Válido hasta el ${new Intl.DateTimeFormat('es-CL', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(data.expiryDate))}.`
